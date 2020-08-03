@@ -1,5 +1,4 @@
-# sisfokol_cbt_2
-sisfokol_cbt_2
+# SISFOKOL CBT v2.0
 
 
 <img src="tmp_tampilan/depan.png" width="100%">
