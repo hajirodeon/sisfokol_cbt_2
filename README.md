@@ -21,6 +21,10 @@ User : admin
 
 Pass : Sisfokol2020
 
+Alamat Akses : 
+
+http://alamatnya/admin
+
 ---
 
 
@@ -31,6 +35,11 @@ User : 1
 
 Pass : 1
 
+Alamat Akses : 
+
+http://alamatnya/admin
+
+
 ---
 
 
@@ -40,6 +49,10 @@ AKSES SISWA :
 User : 1
 
 Pass : 1
+
+Alamat Akses : 
+
+http://alamatnya
 
 ---
 
