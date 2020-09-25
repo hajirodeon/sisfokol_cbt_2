@@ -30,6 +30,37 @@ if ((empty($page)) OR ($page == "0"))
 $limit = 100;
 
 
+
+
+
+//nilai
+$path1 = "../../filebox/soal/$skd";
+
+//cek, sudah ada belum
+if (!file_exists($path1))
+	{
+	mkdir("$path1", 0777);
+	}
+
+$firma_slug = "/$skd"; 
+$nilku = $_SERVER['REQUEST_URI'];
+
+//pecah
+$nilku2 = explode("/", $nilku);
+$nilku21 = $nilku2[1];
+
+
+$_SESSION["myRoxySession"] = "/$nilku21/filebox/soal".$firma_slug;
+
+
+
+
+
+
+
+
+
+
 //PROSES ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //jika ke daftar
 if ($_POST['btnDF'])
@@ -123,7 +154,7 @@ if ($_POST['btnIMX'])
 				      // sedangkan alamat ada di kolom B
 				      $i_xyz = md5("$x$i");
 				      $i_no = cegah($sheet['A']);
-				      $i_isi = cegah($sheet['B']);
+				      $i_isi = nl2br(cegah2($sheet['B']));
 				      $i_kunci = cegah($sheet['C']);
 					  
 						//cek
@@ -223,7 +254,8 @@ if ($_POST['btnEX'])
 	
 
 	//nama file e...
-	$i_filename = "soal-$u_waktu-$u_mapel-$u_tingkat.xls";
+	$i_fileku = seo_friendly_url("soal $u_waktu $u_mapel $u_tingkat");
+	$i_filename = "$i_fileku.xls";
 	$i_judul = "soal";
 	
 
@@ -263,8 +295,8 @@ if ($_POST['btnEX'])
 		//nilai
 		$dt_nox = $dt_nox + 1;
 		$dt_no = balikin($rdt['no']);
-		$dt_isi = trim(balikin($rdt['isi']));
-		$dt_kunci = balikin($rdt['kunci']);
+		$dt_isi = strip_tags(balikin($rdt['isi']));
+		$dt_kunci = strip_tags(balikin($rdt['kunci']));
 
 
 
@@ -465,7 +497,11 @@ require("../../template/js/swap.js");
 
 
 
-<script type="text/javascript" src="<?php echo $sumber;?>/inc/class/ckeditor/ckeditor.js"></script>
+	
+
+
+
+<script type="text/javascript" src="../../inc/class/ckeditor/ckeditor.js"></script>
 
 
   
@@ -498,7 +534,7 @@ if (($s == "baru") OR ($s == "edit"))
 	
 	<div class="row">
 
-	<div class="col-md-6">
+	<div class="col-md-10">
 		
 	<?php
 	echo '<form action="'.$filenya.'" method="post" name="formx2">
@@ -515,7 +551,7 @@ if (($s == "baru") OR ($s == "edit"))
 	<p>
 	Isi Soal, Lengkap dengan Opsi Pilihan Ganda : 
 	<br>
-	<textarea id="editor" name="editor" rows="20" cols="80" style="width: 100%" class="btn-warning">'.$editor.'</textarea>
+	<textarea id="editor" name="editor" rows="20" style="width: 100%" class="btn-warning">'.$editor.'</textarea>
 	
 	</p>
 	
@@ -585,7 +621,6 @@ if (($s == "baru") OR ($s == "edit"))
 
 
 
-/*
 
 
 //jika import
@@ -621,8 +656,6 @@ else if ($s == "import")
 
 	<?php
 	}
-
-*/
 
 
 
@@ -709,8 +742,10 @@ else
 	
 	<p>
 	<input name="skd" type="hidden" value="'.$skd.'">
-	<input name="btnBARU" type="submit" value="ENTRI BARU" class="btn btn-danger">
-	<input name="btnDF" type="submit" value="LIHAT MAPEL LAIN >" class="btn btn-danger">
+	<input name="btnBARU" type="submit" value="ENTRI BARU >>" class="btn btn-danger">
+	<input name="btnIM" type="submit" value="IMPORT >>" class="btn btn-danger">
+	<input name="btnEX" type="submit" value="EXPORT >>" class="btn btn-danger">
+	<input name="btnDF" type="submit" value="LIHAT MAPEL LAIN >>" class="btn btn-danger">
 	</p>
 	<br>
 	

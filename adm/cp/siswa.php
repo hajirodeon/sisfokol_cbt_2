@@ -50,13 +50,6 @@ if ((empty($page)) OR ($page == "0"))
 
 
 
-require '../../inc/class/phpofficeexcel/vendor/autoload.php';
-
-
-
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
 
 
 
@@ -252,22 +245,41 @@ if ($_POST['btnEX'])
 	$i_judul = "SISWA";
 	
 	
+	//require
+	require('../../inc/class/excel/OLEwriter.php');
+	require('../../inc/class/excel/BIFFwriter.php');
+	require('../../inc/class/excel/worksheet.php');
+	require('../../inc/class/excel/workbook.php');
 
 
-	$spreadsheet = new Spreadsheet();
-	$sheet = $spreadsheet->getActiveSheet();
-	$sheet->setCellValue('A1', 'NO');
-	$sheet->setCellValue('B1', 'NIS');
-	$sheet->setCellValue('C1', 'NISN');
-	$sheet->setCellValue('D1', 'NAMA');
-	$sheet->setCellValue('E1', 'KELAS');
-	$sheet->setCellValue('F1', 'LAHIR_TMP');
-	$sheet->setCellValue('G1', 'LAHIR_TGL');
-	$sheet->setCellValue('H1', 'KELAMIN');
-	$sheet->setCellValue('I1', 'VERIFIKASI');
+	//header file
+	function HeaderingExcel($i_filename)
+		{
+		header("Content-type:application/vnd.ms-excel");
+		header("Content-Disposition:attachment;filename=$i_filename");
+		header("Expires: 0");
+		header("Cache-Control: must-revalidate, post-check=0,pre-check=0");
+		header("Pragma: public");
+		}
 
-	$i = 2;		
-	$no = 1;
+	
+	
+	
+	//bikin...
+	HeaderingExcel($i_filename);
+	$workbook = new Workbook("-");
+	$worksheet1 =& $workbook->add_worksheet($i_judul);
+	$worksheet1->write_string(0,0,"NO.");
+	$worksheet1->write_string(0,1,"NIS");
+	$worksheet1->write_string(0,2,"NISN");
+	$worksheet1->write_string(0,3,"NAMA");
+	$worksheet1->write_string(0,4,"KELAS");
+	$worksheet1->write_string(0,5,"LAHIR_TMP");
+	$worksheet1->write_string(0,6,"LAHIR_TGL");
+	$worksheet1->write_string(0,7,"KELAMIN");
+	$worksheet1->write_string(0,8,"VERIFIKASI");
+
+
 
 
 	//data
@@ -303,48 +315,25 @@ if ($_POST['btnEX'])
 			$aktif_ket = "AKTIF";
 			}
 	
-	
+
 		//ciptakan
-		$sheet->setCellValue('A'.$i, $no++);
-		$sheet->setCellValue('B'.$i, $dt_nis);
-		$sheet->setCellValue('C'.$i, $dt_nisn);
-		$sheet->setCellValue('D'.$i, $dt_nama);
-		$sheet->setCellValue('E'.$i, $dt_kelas);
-		$sheet->setCellValue('F'.$i, $dt_lahir_tmp);
-		$sheet->setCellValue('G'.$i, $dt_lahir_tgl);
-		$sheet->setCellValue('H'.$i, $dt_kelamin);
-		$sheet->setCellValue('I'.$i, $aktif_ket);
-		$i++;
+		$worksheet1->write_string($dt_nox,0,$dt_nox);
+		$worksheet1->write_string($dt_nox,1,$dt_nis);
+		$worksheet1->write_string($dt_nox,2,$dt_nisn);
+		$worksheet1->write_string($dt_nox,3,$dt_nama);
+		$worksheet1->write_string($dt_nox,4,$dt_kelas);
+		$worksheet1->write_string($dt_nox,5,$dt_lahir_tmp);
+		$worksheet1->write_string($dt_nox,6,$dt_lahir_tgl);
+		$worksheet1->write_string($dt_nox,7,$dt_kelamin);
+		$worksheet1->write_string($dt_nox,8,$aktif_ket);
 		}
 	while ($rdt = mysqli_fetch_assoc($qdt));
 
 
 
 
-
-
-	//tulis
-	$targetfileku = "../../filebox/excel/$i_filename";
-	$writer = new Xlsx($spreadsheet);
-	$writer->save($targetfileku);
-		
-	
-
-
-		
-	//download
-	header('Content-Type: Application/vnd.ms-excel');
-	header('Content-Disposition: attachment; filename="'.$i_filename.'"');
-	$writer->save('php://output');
-		
-
-	//hapus file, jika telah import
-	$path1 = "../../filebox/excel/$i_filename";
-	chmod($path1,0777);
-	unlink ($path1);
-	
-
-
+	//close
+	$workbook->close();
 
 	
 	//re-direct

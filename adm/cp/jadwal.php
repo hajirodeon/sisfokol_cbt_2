@@ -30,17 +30,6 @@ if ((empty($page)) OR ($page == "0"))
 
 
 
-	
-require '../../inc/class/phpofficeexcel/vendor/autoload.php';
-
-
-
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-
-
-
 
 
 //PROSES ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -204,19 +193,37 @@ if ($_POST['btnEX'])
 	$i_filename = "jadwal.xls";
 	$i_judul = "Jadwal";
 	
+	
+	//require
+	require('../../inc/class/excel/OLEwriter.php');
+	require('../../inc/class/excel/BIFFwriter.php');
+	require('../../inc/class/excel/worksheet.php');
+	require('../../inc/class/excel/workbook.php');
 
 
+	//header file
+	function HeaderingExcel($i_filename)
+		{
+		header("Content-type:application/vnd.ms-excel");
+		header("Content-Disposition:attachment;filename=$i_filename");
+		header("Expires: 0");
+		header("Cache-Control: must-revalidate, post-check=0,pre-check=0");
+		header("Pragma: public");
+		}
+
+	
 
 
-	$spreadsheet = new Spreadsheet();
-	$sheet = $spreadsheet->getActiveSheet();
-	$sheet->setCellValue('A1', 'NO');
-	$sheet->setCellValue('B1', 'WAKTU');
-	$sheet->setCellValue('C1', 'PUKUL');
-	$sheet->setCellValue('D1', 'DURASI');
-	$sheet->setCellValue('E1', 'MAPEL');
-	$sheet->setCellValue('F1', 'TINGKAT');
-
+	//bikin...
+	HeaderingExcel($i_filename);
+	$workbook = new Workbook("-");
+	$worksheet1 =& $workbook->add_worksheet($i_judul);
+	$worksheet1->write_string(0,0,"NO.");
+	$worksheet1->write_string(0,1,"WAKTU");
+	$worksheet1->write_string(0,2,"PUKUL");
+	$worksheet1->write_string(0,3,"DURASI");
+	$worksheet1->write_string(0,4,"MAPEL");
+	$worksheet1->write_string(0,5,"TINGKAT");
 
 
 
@@ -226,9 +233,6 @@ if ($_POST['btnEX'])
 							"waktu ASC, ".
 							"pukul ASC");
 	$rdt = mysqli_fetch_assoc($qdt);
-
-	$i = 2;		
-	$no = 1;
 
 	
 	do
@@ -243,43 +247,19 @@ if ($_POST['btnEX'])
 		$dt_tingkat = balikin($rdt['tingkat']);
 
 
-
 		//ciptakan
-		$sheet->setCellValue('A'.$i, $no++);
-		$sheet->setCellValue('B'.$i, $dt_waktu);
-		$sheet->setCellValue('C'.$i, $dt_pukul);
-		$sheet->setCellValue('D'.$i, $dt_durasi);
-		$sheet->setCellValue('E'.$i, $dt_mapel);
-		$sheet->setCellValue('F'.$i, $dt_tingkat);
-		$i++;
+		$worksheet1->write_string($dt_nox,0,$dt_nox);
+		$worksheet1->write_string($dt_nox,1,$dt_waktu);
+		$worksheet1->write_string($dt_nox,2,$dt_pukul);
+		$worksheet1->write_string($dt_nox,3,$dt_durasi);
+		$worksheet1->write_string($dt_nox,4,$dt_mapel);
+		$worksheet1->write_string($dt_nox,5,$dt_tingkat);
 		}
 	while ($rdt = mysqli_fetch_assoc($qdt));
 
+	//close
+	$workbook->close();
 
-
-
-	//tulis
-	$targetfileku = "../../filebox/excel/$i_filename";
-	$writer = new Xlsx($spreadsheet);
-	$writer->save($targetfileku);
-		
-	
-
-
-		
-	//download
-	header('Content-Type: Application/vnd.ms-excel');
-	header('Content-Disposition: attachment; filename="'.$i_filename.'"');
-	$writer->save('php://output');
-		
-
-	//hapus file, jika telah import
-	$path1 = "../../filebox/excel/$i_filename";
-	chmod($path1,0777);
-	unlink ($path1);
-	
-
-	
 	
 	//re-direct
 	xloc($filenya);

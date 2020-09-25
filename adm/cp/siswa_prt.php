@@ -6,7 +6,6 @@ session_start();
 require("../../inc/config.php");
 require("../../inc/fungsi.php");
 require("../../inc/koneksi.php");
-require("../../inc/class/kartu_ujian.php");
 
 
 
@@ -25,17 +24,10 @@ $kd = nosql($_REQUEST['ckd']);
 
 
 
+require_once("../../inc/class/dompdf/autoload.inc.php");
 
-
-//start class
-$pdf=new PDF('P','mm','A4');
-$pdf->AliasNbPages();
-$pdf->AddPage();
-$pdf->SetTitle($judul);
-$pdf->SetAuthor($author);
-$pdf->SetSubject($description);
-$pdf->SetKeywords($keywords);
-
+use Dompdf\Dompdf;
+$dompdf = new Dompdf();
 
 
 
@@ -114,83 +106,231 @@ $e_passx2 = balikin($rowx['passwordx2']);
 
 
 
-//image
-$pdf-> Image('../../img/logo.jpg',11,11,8); //logo
 
 
 
 
+//isi *START
+ob_start();
 
-//bikin kotak garis luar
-$pdf->Cell(70,50,'',1,0,'L');
+?>
+	
+	<table cellpadding="1" border="1" cellspacing="0">
+	<tr valign="top">
+		<td width="350">
 
 
-
-$baris_tebal = 5;
-$pdf->SetY(10);
-$pdf->SetX(20);
-$pdf->SetFont('Times','B',10);
-$pdf->Cell(70,$baris_tebal,'KARTU UJIAN',0,0,'L');
-$pdf->SetY(10+$baris_tebal);
-$pdf->SetX(20);
-$pdf->Cell(70,$baris_tebal,$sek_nama,0,0,'L');
-
-//garis
-$pdf->Ln();
-$baris_tebal2 = 0.1;
-$pdf->Cell(70,$baris_tebal2,'',1,0,'C');
+		<table cellpadding="1" border="0" cellspacing="0">
+			<tr valign="top">
+				<td width="50">
+					<img src="img/logo.jpg" width="50">					
+				</td>
+				<td width="200">
+					<font face="Sans, sans-serif"><font size="2" style="font-size: 10pt"> 
+						KARTU UJIAN
+					</font></font>
+					<br>
 					
+					<font face="Sans, sans-serif"><font size="2" style="font-size: 14pt"> 
+						<?php echo $sek_nama;?>
+					</font></font>
+				</td>
+			</tr>
+		</table>
+		
+		<hr>
+		
+		<table cellpadding="1" cellspacing="0">
+			<tr valign="top">
+				<td width="100">
+					NIS
+					
+				</td>
+				<td width="200">
+					<font face="Sans, sans-serif"><font size="2" style="font-size: 10pt">: 
+						<?php echo $e_nis;?>
+					</font></font>
+				</td>
+			</tr>
+			
+			
+			<tr valign="top">
+				<td>
+					NISN
+					
+				</td>
+				<td>
+					<font face="Sans, sans-serif"><font size="2" style="font-size: 10pt">: 
+						<?php echo $e_nisn;?>
+					</font></font>
+				</td>
+			</tr>
+		
+			<tr valign="top">
+				<td>
+					NAMA
+					
+				</td>
+				<td>
+					<font face="Sans, sans-serif"><font size="2" style="font-size: 10pt">: 
+						<?php echo $e_nama;?>
+					</font></font>
+				</td>
+			</tr>
+			
+			<tr valign="top">
+				<td>
+					KELAS
+					
+				</td>
+				<td>
+					<font face="Sans, sans-serif"><font size="2" style="font-size: 10pt">: 
+						<?php echo $e_kelas;?>
+					</font></font>
+				</td>
+			</tr>
+		
+			<tr valign="top">
+				<td>
+					USERNAME
+					
+				</td>
+				<td>
+					<font face="Sans, sans-serif"><font size="2" style="font-size: 10pt">: 
+						<?php echo $e_nis;?>
+					</font></font>
+				</td>
+			</tr>
+			
+			
+			<tr valign="top">
+				<td>
+					PASSWORD
+					
+				</td>
+				<td>
+					<font face="Sans, sans-serif"><font size="2" style="font-size: 10pt">: 
+						<?php echo $e_passx2;?>
+					</font></font>
+				</td>
+			</tr>
+			
+		</table>
+		
 
-//set posisi
-$pdf->SetY(10+(3 * $baris_tebal));
 
-$pdf->SetFont('Times','',10);
-$pdf->Cell(20,5,'NIS ',0,0,'L');
-$pdf->SetFont('Times','B',10);
-$pdf->Cell(30,5,': '.$e_nis.'',0,0,'L');
-$pdf->Ln();
-
-$pdf->SetFont('Times','',10);
-$pdf->Cell(20,5,'NISN ',0,0,'L');
-$pdf->SetFont('Times','B',10);
-$pdf->Cell(30,5,': '.$e_nisn.'',0,0,'L');
-$pdf->Ln();
+		</td>
+	</tr>	
+</table>
 
 
-$pdf->SetFont('Times','',10);
-$pdf->Cell(20,5,'Nama ',0,0,'L');
-$pdf->SetFont('Times','B',10);
-$pdf->Cell(30,5,': '.$e_nama.'',0,0,'L');
-$pdf->Ln();
+<?php
+/*
+echo '<table width="300" border="1" cellpadding="1" cellspacing="0">
+	<tr valign="top">
+		<td align="center">
+			<img src="../../img/logo.jpg" height="50">
+		</td>
+		<td width="100%" align="left">
+			KARTU UJIAN
+			<br>
+			
+			<b>'.$sek_nama.'</b>
+		</td>
+	</tr>
+</table>
+
+<table width="300" border="1" cellpadding="1" cellspacing="0">
+	<tr valign="top">
+	<td align="left">
+	
+		<table width="100%" cellpadding="1" cellspacing="0">
+			<tr valign="top">
+				<td width="100" align="left">
+					NIS
+				</td>
+				<td align="left">
+					: <b>'.$e_nis.'</b>
+				</td>
+			</tr>
+			
+			<tr valign="top">
+				<td width="100" align="left">
+					NISN
+				</td>
+				<td align="left">
+					: <b>'.$e_nisn.'</b>
+				</td>
+			</tr>
+			
+			<tr valign="top">
+				<td width="100" align="left">
+					NAMA
+				</td>
+				<td align="left">
+					: <b>'.$e_nama.'</b>
+				</td>
+			</tr>
+			
+			<tr valign="top">
+				<td width="100" align="left">
+					KELAS
+				</td>
+				<td align="left">
+					: <b>'.$e_kelas.'</b>
+				</td>
+			</tr>
+			
+			<tr valign="top">
+				<td width="100" align="left">
+					USERNAME
+				</td>
+				<td align="left">
+					: <b>'.$e_nis.'</b>
+				</td>
+			</tr>
+			
+			<tr valign="top">
+				<td width="100" align="left">
+					PASSWORD
+				</td>
+				<td align="left">
+					: <b>'.$e_passx2.'</b>
+				</td>
+			</tr>
+		</table>
+			
+
+		</td>
+	</tr>
+</table>';
+	
+ * 
+ */
 
 
-$pdf->SetFont('Times','',10);
-$pdf->Cell(20,5,'Kelas ',0,0,'L');
-$pdf->SetFont('Times','B',10);
-$pdf->Cell(30,5,': '.$e_kelas.'',0,0,'L');
-$pdf->Ln();
 
-$pdf->SetFont('Times','',10);
-$pdf->Cell(20,5,'Username ',0,0,'L');
-$pdf->SetFont('Times','B',10);
-$pdf->Cell(30,5,': '.$e_nis.'',0,0,'L');
-$pdf->Ln();
 
-$pdf->SetFont('Times','',10);
-$pdf->Cell(20,5,'Password ',0,0,'L');
-$pdf->SetFont('Times','B',10);
-$pdf->Cell(30,5,': '.$e_passx2.'',0,0,'L');
-$pdf->Ln();
+
+
+//isi
+$isi = ob_get_contents();
+ob_end_clean();
+
+
+
+//echo $isi;
 
 
 
 
 
+$dompdf->loadHtml($isi);
 
-
-
-//output-kan ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-$pdf->Output("siswa-$e_nis.pdf",I);
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+// Setting ukuran dan orientasi kertas
+$dompdf->setPaper('A4', 'potrait');
+// Rendering dari HTML Ke PDF
+$dompdf->render();
+// Melakukan output file Pdf
+$dompdf->stream('siswa-'.$e_nis.'.pdf');
 ?>

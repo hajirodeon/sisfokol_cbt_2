@@ -47,9 +47,9 @@ if ((isset($_GET['aksi']) && $_GET['aksi'] == 'simpan'))
 	
 	
 
-	//null-kan
-	mysqli_free_result();
-	xclose($koneksi);
+	//re-direct, kerjakan lainnya...
+	$ke = "soal.php?jkd=$jkd";
+	xloc($ke);
 	exit();
 	}
 	

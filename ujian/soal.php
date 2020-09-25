@@ -463,6 +463,7 @@ else
 	</div>
 
 	<?php
+	/*
 	//query
 	$p = new Pager();
 	$start = $p->findStart($limit);
@@ -687,8 +688,319 @@ else
 	<br>
 	<br>
 	<br>';
+	*/
 	
 	
+
+	//cek dulu... udah ada atau belum
+	$qyuk2 = mysqli_query($koneksi, "SELECT * FROM siswa_soal ".
+							"WHERE siswa_kd = '$sesiku' ".
+							"AND jadwal_kd = '$jkd'");
+	$ryuk2 = mysqli_fetch_assoc($qyuk2);
+	$tyuk2 = mysqli_num_rows($qyuk2);
+	
+	
+	//jika null, kasi semua dulu..
+	if (empty($tyuk2))
+		{
+		$qkuy = mysqli_query($koneksi, "SELECT * FROM m_soal ".
+										"WHERE jadwal_kd = '$jkd' ".
+										"ORDER BY round(no) ASC");
+		$rkuy = mysqli_fetch_assoc($qkuy);
+		
+		do
+			{
+			//nilai
+			$kuy_no = $kuy_no + 1;
+			$kuy_kd = nosql($rkuy['kd']);
+			$kuy_kunci = balikin($rkuy['kunci']);
+			$xyz = md5("$sesiku$kuy_kdjadwal_kd$kuy_no");
+		
+										
+			//insert
+			mysqli_query($koneksi, "INSERT INTO siswa_soal(kd, jadwal_kd, ".
+							"siswa_kd, soal_kd, jawab, ".
+							"kunci, benar, postdate) VALUES ".
+							"('$xyz', '$jkd', ".
+							"'$sesiku', '$kuy_kd', '', ".
+							"'$kuy_kunci', 'false', '$today')");
+			}
+		while ($rkuy = mysqli_fetch_assoc($qkuy));
+		}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//query
+	$limit = 1;
+	$p = new Pager();
+	$start = $p->findStart($limit);
+
+
+	$sqlcount = "SELECT * FROM siswa_soal ".
+				"WHERE jadwal_kd = '$jkd' ".
+				"AND siswa_kd = '$sesiku' ".
+				"AND jawab = '' ".
+				"ORDER BY RAND()";
+				
+	$sqlresult = $sqlcount;
+	
+	$count = mysqli_num_rows(mysqli_query($koneksi, $sqlcount));
+	$pages = $p->findPages($count, $limit);
+	$result = mysqli_query($koneksi, "$sqlresult LIMIT ".$start.", ".$limit);
+	$target = $filenya;
+	$pagelist = $p->pageList($_GET['page'], $pages, $target);
+	$data = mysqli_fetch_array($result);
+	
+	
+	
+	//jika ada
+	if (!empty($count))
+		{
+		echo "&nbsp;";
+		
+		do 
+			{
+			if ($warna_set ==0)
+				{
+				$warna = $warna01;
+				$warna_set = 1;
+				}
+			else
+				{
+				$warna = $warna02;
+				$warna_set = 0;
+				}
+	
+			$nomer = $nomer + 1;
+			
+			
+
+			$i_kdx = nosql($data['soal_kd']);
+			
+			//detail e
+			$qkuy = mysqli_query($koneksi, "SELECT * FROM m_soal ".
+											"WHERE jadwal_kd = '$jkd' ".
+											"AND kd = '$i_kdx'");
+			$rkuy = mysqli_fetch_assoc($qkuy);						
+			$i_kd = nosql($rkuy['kd']);
+			$i_no = balikin($rkuy['no']);
+			$i_kunci = balikin($rkuy['kunci']);
+			$i_isi = balikin($rkuy['isi']);
+			$i_postdate = balikin($rkuy['postdate']);
+	
+			
+			//yg dijawab
+			$qyuk = mysqli_query($koneksi, "SELECT * FROM siswa_soal ".
+									"WHERE siswa_kd = '$sesiku' ".
+									"AND jadwal_kd = '$jkd' ".
+									"AND soal_kd = '$i_kd'");
+			$ryuk = mysqli_fetch_assoc($qyuk);
+			$yuk_kdku = nosql($ryuk['kd']);
+			$yuk_jawabku = balikin($ryuk['jawab']);
+			
+			
+			
+			?>
+				<script language='javascript'>
+			//membuat document jquery
+			$(document).ready(function(){
+							
+							
+							
+				$('#xpilih<?php echo $nomer;?>').change(function() {
+					var nilku = $(this).val();
+	
+	
+					$('#iproses<?php echo $i_kd;?>').show();
+							
+					
+					$.ajax({
+						url: "i_jawab.php?aksi=simpan&jkd=<?php echo $jkd;?>&skd=<?php echo $sesiku;?>&soalkd=<?php echo $i_kd;?>&nilku="+nilku,
+						type:$(this).attr("method"),
+						data:$(this).serialize(),
+						success:function(data){				
+							$("#ihasil<?php echo $nomer;?>").html(data);
+							$('#iproses<?php echo $i_kd;?>').hide();
+							}
+						});
+					
+					
+					
+					
+					$.ajax({
+						url: "i_jawab.php?aksi=hitung&jkd=<?php echo $jkd;?>&skd=<?php echo $sesiku;?>&soalkd=<?php echo $i_kd;?>&nilku="+nilku,
+						type:$(this).attr("method"),
+						data:$(this).serialize(),
+						success:function(data){					
+							$("#udahjawab").html(data);
+							}
+						});
+					
+	
+					
+					$.ajax({
+						url: "i_timer.php?aksi=setpostdate&jkd=<?php echo $jkd;?>&skd=<?php echo $sesiku;?>",
+						type:$(this).attr("method"),
+						data:$(this).serialize(),
+						success:function(data){					
+							$("#setpostdate").html(data);
+							}
+						});
+						
+					
+			    });
+	
+	
+					
+			});
+			
+			</script>
+	
+	
+	
+	
+			<?php
+	
+			echo '<a name="ku'.$i_kd.'"></a>
+			
+			<div class="table-responsive">          
+			<table class="table" border="1">
+			<thead>
+			<tr valign="top" bgcolor="'.$e_warnaheader.'">
+			<td><strong><font color="'.$e_warnatext.'">SOAL</font></strong></td>
+			</tr>
+			</thead>
+			<tbody>';
+					
+			echo "<tr valign=\"top\" bgcolor=\"$warna\" onmouseover=\"this.bgColor='$e_warnaover';\" onmouseout=\"this.bgColor='$warna';\">";
+			echo '<td>
+			'.$i_isi.'
+			
+			<hr>
+			
+			<p>
+			 
+			<form name="xformx'.$nomer.'" id="xformx'.$nomer.'">
+			
+			Jawab : <select name="xpilih'.$nomer.'" id="xpilih'.$nomer.'" class="btn btn-warning">
+						<option value="'.$yuk_jawabku.'" selected>'.$yuk_jawabku.'</option>	
+						<option value="A">A</option>	
+						<option value="B">B</option>	
+						<option value="C">C</option>	
+						<option value="D">D</option>	
+						<option value="E">E</option>	
+						</select>			
+			
+			</p>		
+			</form>
+					
+			<div id="iproses'.$i_kd.'" style="display:none">
+				<img src="'.$sumber.'/template/img/progress-bar.gif" width="100" height="16">
+			</div>
+			
+			<div id="ihasil'.$nomer.'"></div>
+			
+			
+			</td>
+	        </tr>
+			</tbody>
+		  	</table>
+		  	</div>';
+			}
+		while ($data = mysqli_fetch_assoc($result));
+		}
+
+	else
+		{
+		?>
+
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="info-box">
+            <span class="info-box-icon bg-red"><i class="glyphicon glyphicon-edit"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">SEMUA SOAL</span>
+              <span class="info-box-number">Sudah Dikerjakan</span>
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+          <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        
+
+
+		<?php
+		}						
+
+
+
+				
+	?>
+	
+	<script language='javascript'>
+	//membuat document jquery
+	$(document).ready(function(){
+		
+		$("#btnSELESAI").on('click', function(){
+			
+			$("#xformselesai").submit(function(){
+				$.ajax({
+					url: "i_jawab.php?aksi=selesai&gmkd=<?php echo $gmkd;?>&jkd=<?php echo $jkd;?>&skd=<?php echo $sesiku;?>",
+					type:$(this).attr("method"),
+					data:$(this).serialize(),
+					success:function(data){					
+						$("#iprosesku").show();
+						$("#ihasilselesai").html(data);
+						}
+					});
+				return false;
+			});
+		
+		
+		});	
+
+
+			
+	});
+	
+	</script>
+
+
+	<?php
+		
+	
+	echo '<br>
+	<div id="ihasilselesai"></div>
+	<div id="iprosesku" style="display:none">
+		<img src="'.$sumber.'/template/img/progress-bar.gif" width="100" height="16">
+	</div>
+
+	<form name="xformselesai" id="xformselesai">
+	<hr>
+	<input name="btnSELESAI" id="btnSELESAI" type="submit" class="btn btn-block btn-danger" value="KUMPULKAN, SELESAI MENGERJAKAN.">
+	<hr>
+	
+	</form>
+	
+	
+	<br>
+	<br>
+	<br>';
+
+
+
+
+
+
 	
 	
 	
