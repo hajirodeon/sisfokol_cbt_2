@@ -33,6 +33,15 @@ if ((isset($_GET['aksi']) && $_GET['aksi'] == 'simpan'))
 	
 	
 	
+	//baca kunci...
+	$qku = mysqli_query($koneksi, "SELECT * FROM m_soal ".
+						"WHERE jadwal_kd = '$jkd' ".
+						"AND kd = '$soalkd'");
+	$rku = mysqli_fetch_assoc($qku);
+	$ku_kunci = balikin($rku['kunci']); 
+	
+	
+		
 	//hapus dulu yg lama...
 	mysqli_query($koneksi, "DELETE FROM siswa_soal ".
 						"WHERE siswa_kd = '$skd' ".
@@ -40,9 +49,24 @@ if ((isset($_GET['aksi']) && $_GET['aksi'] == 'simpan'))
 						"AND soal_kd = '$soalkd'");
 	
 	
+	
+	//jika benar
+	if ($nilku == $ku_kunci)
+		{
+		$ku_benar = "true";
+		}
+	else if ($nilku <> $ku_kunci)
+		{
+		$ku_benar = "false";
+		}
+	
+	
+	
 	//insert
-	mysqli_query($koneksi, "INSERT INTO siswa_soal(kd, jadwal_kd, siswa_kd, soal_kd, jawab, postdate) VALUES ".
-					"('$xyz', '$jkd', '$skd', '$soalkd', '$nilku', '$today')");
+	mysqli_query($koneksi, "INSERT INTO siswa_soal(kd, jadwal_kd, siswa_kd, ".
+								"soal_kd, jawab, kunci, benar, postdate) VALUES ".
+								"('$xyz', '$jkd', '$skd', ".
+								"'$soalkd', '$nilku', '$ku_kunci', '$ku_benar', '$today')");
 
 	
 	
